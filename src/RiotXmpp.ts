@@ -163,8 +163,12 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
         this.emit('message', data);
         break;
       case 'iq':
-        const roster = formatRoster(data);
-        this.emit('friends', roster);
+        // Only handle roster IQs — ignore bind/session/other IQ types
+        // that arrive during or just after the handshake.
+        if (data?.query?.xmlns === 'jabber:iq:riotgames:roster') {
+          const roster = formatRoster(data);
+          this.emit('friends', roster);
+        }
         break;
     }
   }

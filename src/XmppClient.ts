@@ -103,6 +103,9 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
       this.socket.end();
       this.socket = null;
     }
+    // Clear the buffer to prevent stale data from the previous connection
+    // bleeding into the next account's connection stream.
+    this.bufferedMessage = '';
   }
 
   private handleData(data: string) {
