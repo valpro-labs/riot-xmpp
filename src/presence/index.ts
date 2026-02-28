@@ -50,14 +50,47 @@ export interface RiotClientPresence {
   pty: string;
 }
 
+export type SessionLoopState = 'MENUS' | 'PREGAME' | 'INGAME';
+
+export type ProvisioningFlow =
+  | 'CustomGame'
+  | 'SkillTest'
+  | 'Matchmaking'
+  | 'NewPlayerExperience'
+  | 'Invalid';
+
+export type QueueId =
+  | 'spikerush'
+  | 'competitive'
+  | 'deathmatch'
+  | 'unrated'
+  | 'snowball'
+  | '';
+
+export type PartyState =
+  | 'DEFAULT'
+  | 'CUSTOM_GAME_SETUP'
+  | 'CUSTOM_GAME_STARTING'
+  | 'MATCHMAKING'
+  | 'STARTING_MATCHMAKING'
+  | 'LEAVING_MATCHMAKING'
+  | 'MATCHMADE_GAME_STARTING'
+  | 'SOLO_EXPERIENCE_STARTING';
+
+export type PartyAccessibility = 'CLOSED' | 'OPEN';
+
+export type CustomGameTeam = 'TeamOne' | 'TeamTwo' | 'TeamSpectate';
+
+export type MatchTeam = 'Blue' | 'Red';
+
 /**
  * Decoded content of ValorantPresence['p']
  */
 export interface ValorantPresenceData {
   isValid: boolean;
   isIdle: boolean;
-  queueId: string;
-  provisioningFlow: string;
+  queueId: QueueId;
+  provisioningFlow: ProvisioningFlow;
   partyId: string;
   partySize: number;
   maxPartySize: number;
@@ -102,17 +135,18 @@ export interface PremierPresenceData {
 }
 
 export interface MatchPresenceData {
-  sessionLoopState: string;
-  provisioningFlow: string;
+  sessionLoopState: SessionLoopState;
+  provisioningFlow: ProvisioningFlow;
   matchMap: string;
-  queueId: string;
+  queueId: QueueId;
 }
 
 export interface PartyPresenceData {
   partyId: string;
+  partyName: string;
   isPartyOwner: boolean;
-  partyState: string;
-  partyAccessibility: string;
+  partyState: PartyState;
+  partyAccessibility: PartyAccessibility;
   partyLFM: boolean;
   partyClientVersion: string;
   partyVersion: number;
@@ -121,14 +155,15 @@ export interface PartyPresenceData {
   isPartyCrossPlayEnabled: boolean;
   isPlayerCrossPlayEnabled: boolean;
   partyPrecisePlatformTypes: number;
-  customGameName: string;
-  customGameTeam: string;
+  customGameName: CustomGameTeam | '';
+  customGameTeam: CustomGameTeam | '';
   maxPartySize: number;
   tournamentId: string;
   rosterId: string;
-  partyOwnerSessionLoopState: string;
+  partyOwnerSessionLoopState: SessionLoopState;
   partyOwnerMatchMap: string;
-  partyOwnerProvisioningFlow: string;
+  partyOwnerMatchCurrentTeam: MatchTeam;
+  partyOwnerProvisioningFlow: ProvisioningFlow;
   partyOwnerMatchScoreAllyTeam: number;
   partyOwnerMatchScoreEnemyTeam: number;
 }
