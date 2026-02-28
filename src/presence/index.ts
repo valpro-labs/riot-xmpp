@@ -176,6 +176,36 @@ export interface PlayerPresenceData {
   leaderboardPosition: number;
 }
 
+/**
+ * Keystone game presence combined with its timestamp and future decoded payload.
+ */
+export interface KeystonePresenceOutput {
+  /** Last-updated timestamp (`keystone['s.t']`), milliseconds since epoch. */
+  timestamp: number | null;
+  /** Decoded data (currently empty/null for Keystone). */
+  data: null;
+}
+
+/**
+ * Valorant game presence combined with its decoded payload and timestamp.
+ */
+export interface ValorantPresenceOutput {
+  /** Last-updated timestamp (`valorant['s.t']`), milliseconds since epoch. */
+  timestamp: number | null;
+  /** Decoded content of the `p` field. */
+  data: ValorantPresenceData | null;
+}
+
+/**
+ * Riot Client game presence combined with its decoded payload and timestamp.
+ */
+export interface RiotClientPresenceOutput {
+  /** Last-updated timestamp (`riot_client['s.t']`), milliseconds since epoch. */
+  timestamp: number | null;
+  /** Decoded content of the `pd` field. */
+  data: RiotClientPresenceData | null;
+}
+
 export interface PresenceOutput {
   sender: Jid;
   recipient: Jid;
@@ -183,8 +213,9 @@ export interface PresenceOutput {
   status?: string;
   platform?: string;
   id?: string;
-  valorantData: ValorantPresenceData | null;
-  riotClientData: RiotClientPresenceData | null;
+  keystone: KeystonePresenceOutput | null;
+  valorant: ValorantPresenceOutput | null;
+  riotClient: RiotClientPresenceOutput | null;
 }
 
 function decodeBase64Json<T>(p: string | undefined): T | null {
@@ -204,8 +235,29 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
   const sender = parseJid(from);
   const recipient = parseJid(to);
 
-  const valorantData = decodeBase64Json<ValorantPresenceData>(games?.valorant?.p);
-  const riotClientData = decodeBase64Json<RiotClientPresenceData>(games?.riot_client?.pd);
+  let keystone: KeystonePresenceOutput | null = null;
+  if (games?.keystone) {
+    keystone = {
+      timestamp: games.keystone['s.t'] ?? null,
+      data: null,
+    };
+  }
+
+  let valorant: ValorantPresenceOutput | null = null;
+  if (games?.valorant) {
+    valorant = {
+      timestamp: games.valorant['s.t'] ?? null,
+      data: decodeBase64Json<ValorantPresenceData>(games.valorant.p),
+    };
+  }
+
+  let riotClient: RiotClientPresenceOutput | null = null;
+  if (games?.riot_client) {
+    riotClient = {
+      timestamp: games.riot_client['s.t'] ?? null,
+      data: decodeBase64Json<RiotClientPresenceData>(games.riot_client.pd),
+    };
+  }
 
   return {
     sender,
@@ -214,7 +266,8 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
     status,
     platform,
     id,
-    valorantData,
-    riotClientData
+    keystone,
+    valorant,
+    riotClient,
   };
 }
