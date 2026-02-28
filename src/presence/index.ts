@@ -2,10 +2,12 @@ import { decode } from 'js-base64';
 
 import { Jid, parseJid } from '../helpers/parsers';
 
+export type PresenceShow = 'chat' | 'away' | 'dnd' | 'mobile';
+
 export interface PresenceInput {
   from: string;
   to: string;
-  show?: string;
+  show?: PresenceShow;
   type?: string;
   games?: PresenceGames;
   status?: string;
@@ -201,7 +203,7 @@ export interface RiotClientPresenceOutput {
 export interface PresenceOutput {
   sender: Jid;
   recipient: Jid;
-  show?: string;
+  show?: PresenceShow;
   status?: string;
   platform?: string;
   id?: string;
