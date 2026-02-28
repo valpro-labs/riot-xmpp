@@ -59,14 +59,6 @@ export type ProvisioningFlow =
   | 'NewPlayerExperience'
   | 'Invalid';
 
-export type QueueId =
-  | 'spikerush'
-  | 'competitive'
-  | 'deathmatch'
-  | 'unrated'
-  | 'snowball'
-  | '';
-
 export type PartyState =
   | 'DEFAULT'
   | 'CUSTOM_GAME_SETUP'
@@ -89,7 +81,7 @@ export type MatchTeam = 'Blue' | 'Red';
 export interface ValorantPresenceData {
   isValid: boolean;
   isIdle: boolean;
-  queueId: QueueId;
+  queueId: string;
   provisioningFlow: ProvisioningFlow;
   partyId: string;
   partySize: number;
@@ -138,7 +130,7 @@ export interface MatchPresenceData {
   sessionLoopState: SessionLoopState;
   provisioningFlow: ProvisioningFlow;
   matchMap: string;
-  queueId: QueueId;
+  queueId: string;
 }
 
 export interface PartyPresenceData {
@@ -155,7 +147,7 @@ export interface PartyPresenceData {
   isPartyCrossPlayEnabled: boolean;
   isPlayerCrossPlayEnabled: boolean;
   partyPrecisePlatformTypes: number;
-  customGameName: CustomGameTeam | '';
+  customGameName: string;
   customGameTeam: CustomGameTeam | '';
   maxPartySize: number;
   tournamentId: string;
