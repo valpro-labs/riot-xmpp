@@ -4,11 +4,13 @@ import { Jid, parseJid } from '../helpers/parsers';
 
 export type PresenceShow = 'chat' | 'away' | 'dnd' | 'mobile';
 
+export type PresenceType = 'available' | 'unavailable' | null;
+
 export interface PresenceInput {
   from: string;
   to: string;
+  type?: PresenceType;
   show?: PresenceShow;
-  type?: string;
   games?: PresenceGames;
   status?: string;
   platform?: string;
@@ -203,6 +205,7 @@ export interface RiotClientPresenceOutput {
 export interface PresenceOutput {
   sender: Jid;
   recipient: Jid;
+  type?: PresenceType;
   show?: PresenceShow;
   status?: string;
   platform?: string;
@@ -224,7 +227,7 @@ function decodeBase64Json<T>(p: string | undefined): T | null {
 }
 
 export function formatPresence(presence: PresenceInput): PresenceOutput {
-  const { from, to, games, show, status, platform, id } = presence;
+  const { from, to, type, games, show, status, platform, id } = presence;
 
   const sender = parseJid(from);
   const recipient = parseJid(to);
@@ -256,6 +259,7 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
   return {
     sender,
     recipient,
+    type,
     show,
     status,
     platform,
