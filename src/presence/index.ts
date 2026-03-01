@@ -22,6 +22,7 @@ export interface PresenceGames {
   keystone?: KeystonePresence;
   valorant?: ValorantPresence;
   riot_client?: RiotClientPresence;
+  league_of_legends?: LeaguePresence;
   [gameName: string]: any;
 }
 
@@ -39,6 +40,17 @@ export interface ValorantPresence {
   p: string;
   's.p': string;
   's.t': number;
+  pty: string;
+}
+
+export interface LeaguePresence {
+  's.r': string;
+  st: string;
+  's.t': number;
+  m: string;
+  p: string;
+  's.p': string;
+  's.c': string;
   pty: string;
 }
 
