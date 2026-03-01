@@ -195,16 +195,6 @@ export interface KeystonePresenceOutput {
 }
 
 /**
- * Valorant game presence combined with its decoded payload and timestamp.
- */
-export interface ValorantPresenceOutput {
-  /** Last-updated timestamp (`valorant['s.t']`), milliseconds since epoch. */
-  timestamp: number | null;
-  /** Decoded content of the `p` field. */
-  data: ValorantPresenceData | null;
-}
-
-/**
  * Riot Client game presence combined with its decoded payload and timestamp.
  */
 export interface RiotClientPresenceOutput {
@@ -212,6 +202,16 @@ export interface RiotClientPresenceOutput {
   timestamp: number | null;
   /** Decoded content of the `pd` field. */
   data: RiotClientPresenceData | null;
+}
+
+/**
+ * Valorant game presence combined with its decoded payload and timestamp.
+ */
+export interface ValorantPresenceOutput {
+  /** Last-updated timestamp (`valorant['s.t']`), milliseconds since epoch. */
+  timestamp: number | null;
+  /** Decoded content of the `p` field. */
+  data: ValorantPresenceData | null;
 }
 
 export interface PresenceOutput {
