@@ -184,6 +184,34 @@ export interface PlayerPresenceData {
   leaderboardPosition: number;
 }
 
+export interface LeaguePresenceData {
+  championId: string;
+  companionId: string;
+  damageSkinId: string;
+  gameQueueType: string;
+  gameStatus: LeagueGameStatus;
+  iconOverride: string;
+  legendaryMasteryScore: string;
+  level: string;
+  mapId: string;
+  mapSkinId: string;
+  profileIcon: string;
+  puuid: string;
+  rankedPrevSeasonDivision: string;
+  rankedPrevSeasonTier: string;
+  regalia: LeagueRegalia;
+  skinVariant: string;
+  skinname: string;
+}
+
+export type LeagueGameStatus = 'outOfGame' | 'inGame' | 'championSelect' | 'hosting';
+
+export interface LeagueRegalia {
+  bannerType: number;
+  crestType: number;
+  selectedPrestigeCrest: number;
+}
+
 /**
  * Keystone game presence combined with its timestamp and future decoded payload.
  */
@@ -214,6 +242,16 @@ export interface ValorantPresenceOutput {
   data: ValorantPresenceData | null;
 }
 
+/**
+ * League game presence combined with its decoded payload and timestamp.
+ */
+export interface LeaguePresenceOutput {
+  /** Last-updated timestamp (`league_of_legends['s.t']`), milliseconds since epoch. */
+  timestamp: number | null;
+  /** Decoded content of the `p` field. */
+  data: LeaguePresenceData | null;
+}
+
 export interface PresenceOutput {
   sender: Jid;
   recipient: Jid;
@@ -225,6 +263,7 @@ export interface PresenceOutput {
   keystone: KeystonePresenceOutput | null;
   riotClient: RiotClientPresenceOutput | null;
   valorant: ValorantPresenceOutput | null;
+  lol: LeaguePresenceOutput | null;
 }
 
 function decodeBase64Json<T>(p: string | undefined): T | null {
@@ -234,6 +273,23 @@ function decodeBase64Json<T>(p: string | undefined): T | null {
     return JSON.parse(decodedString);
   } catch (e) {
     console.error('Error decoding base64 json:', e);
+    return null;
+  }
+}
+
+/**
+ * Parses League of Legends presence data.
+ * The `regalia` field is stringified JSON and can cause issues if parsed directly.
+ * We strip it out first and replace HTML quotes before parsing.
+ */
+function decodeLeaguePresence(p: string | undefined): LeaguePresenceData | null {
+  if (!p) return null;
+  try {
+    const cleanedString = p.replace(/&quot;/g, '"').replace(/"regalia":.+}",?/, '');
+    const parsed = JSON.parse(cleanedString);
+    return parsed as LeaguePresenceData;
+  } catch (e) {
+    console.error('Error decoding league presence p:', e);
     return null;
   }
 }
@@ -268,6 +324,14 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
     };
   }
 
+  let lol: LeaguePresenceOutput | null = null;
+  if (games?.league_of_legends) {
+    lol = {
+      timestamp: games.league_of_legends['s.t'] ?? null,
+      data: decodeLeaguePresence(games.league_of_legends.p),
+    };
+  }
+
   return {
     sender,
     recipient,
@@ -279,5 +343,6 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
     keystone,
     riotClient,
     valorant,
+    lol,
   };
 }
