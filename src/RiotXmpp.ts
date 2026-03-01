@@ -26,6 +26,7 @@ interface XmppEvents {
   presence: (data: PresenceOutput) => void;
   message: (data: any) => void;
   friends: (data: RosterOutput) => void;
+  debug: (type: string, data: any) => void;
 }
 
 interface XmppRegionObject {
@@ -45,6 +46,8 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
   private manualDisconnect = false;
   private currentConnectionId = 0;
 
+  private debug: boolean = false;
+
   constructor(authProvider: IXmppAuthProvider, socketProvider?: ISocketProvider) {
     super();
     this.authProvider = authProvider;
@@ -63,7 +66,12 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
         this.emit('error', e);
       }
     });
+  }
 
+  public toggleDebug(bool: boolean) {
+    this.debug = bool;
+
+    return this;
   }
 
   public async connect() {
@@ -154,6 +162,10 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
   }
 
   private _handleData(type: string, data: any) {
+    if (this.debug) {
+      this.emit('debug', type, data);
+    }
+
     switch (type) {
       case 'presence':
         const presence = formatPresence(data);
