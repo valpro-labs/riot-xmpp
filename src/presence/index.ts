@@ -190,6 +190,7 @@ export interface LeaguePresenceData {
   damageSkinId: string;
   gameQueueType: string;
   gameStatus: LeagueGameStatus;
+  gameMode: LeagueGameMode;
   iconOverride: string;
   legendaryMasteryScore: string;
   level: string;
@@ -205,6 +206,7 @@ export interface LeaguePresenceData {
 }
 
 export type LeagueGameStatus = 'outOfGame' | 'inGame' | 'championSelect' | 'hosting';
+export type LeagueGameMode = 'CLASSIC' | 'ARAM' | 'TFT' | 'URF' | 'PRACTICETOOL';
 
 export interface LeagueRegalia {
   bannerType: number;
