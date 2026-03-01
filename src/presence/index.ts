@@ -20,8 +20,8 @@ export interface PresenceInput {
 
 export interface PresenceGames {
   keystone?: KeystonePresence;
-  valorant?: ValorantPresence;
   riot_client?: RiotClientPresence;
+  valorant?: ValorantPresence;
   league_of_legends?: LeaguePresence;
   [gameName: string]: any;
 }
@@ -31,6 +31,18 @@ export interface KeystonePresence {
   's.t': number;
   m: string;
   's.p': string;
+  pty: string;
+}
+
+export interface RiotClientPresence {
+  's.r': string;
+  st: string;
+  's.t': number;
+  m: string;
+  p: string;
+  pd: string; // Base64 encoded RiotClientPresenceData
+  's.p': string;
+  's.c': string;
   pty: string;
 }
 
@@ -49,18 +61,6 @@ export interface LeaguePresence {
   's.t': number;
   m: string;
   p: string;
-  's.p': string;
-  's.c': string;
-  pty: string;
-}
-
-export interface RiotClientPresence {
-  's.r': string;
-  st: string;
-  's.t': number;
-  m: string;
-  p: string;
-  pd: string; // Base64 encoded RiotClientPresenceData
   's.p': string;
   's.c': string;
   pty: string;
@@ -223,8 +223,8 @@ export interface PresenceOutput {
   platform?: string;
   id?: string;
   keystone: KeystonePresenceOutput | null;
-  valorant: ValorantPresenceOutput | null;
   riotClient: RiotClientPresenceOutput | null;
+  valorant: ValorantPresenceOutput | null;
 }
 
 function decodeBase64Json<T>(p: string | undefined): T | null {
@@ -252,19 +252,19 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
     };
   }
 
-  let valorant: ValorantPresenceOutput | null = null;
-  if (games?.valorant) {
-    valorant = {
-      timestamp: games.valorant['s.t'] ?? null,
-      data: decodeBase64Json<ValorantPresenceData>(games.valorant.p),
-    };
-  }
-
   let riotClient: RiotClientPresenceOutput | null = null;
   if (games?.riot_client) {
     riotClient = {
       timestamp: games.riot_client['s.t'] ?? null,
       data: decodeBase64Json<RiotClientPresenceData>(games.riot_client.pd),
+    };
+  }
+
+  let valorant: ValorantPresenceOutput | null = null;
+  if (games?.valorant) {
+    valorant = {
+      timestamp: games.valorant['s.t'] ?? null,
+      data: decodeBase64Json<ValorantPresenceData>(games.valorant.p),
     };
   }
 
@@ -277,7 +277,7 @@ export function formatPresence(presence: PresenceInput): PresenceOutput {
     platform,
     id,
     keystone,
-    valorant,
     riotClient,
+    valorant,
   };
 }
