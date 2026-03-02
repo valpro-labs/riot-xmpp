@@ -268,7 +268,7 @@ export interface PresenceOutput {
   lol: LeaguePresenceOutput | null;
 }
 
-function decodeBase64Json<T>(p: string | undefined): T | null {
+export function decodeBase64Json<T>(p: string | undefined): T | null {
   if (!p) return null;
   try {
     const decodedString = decode(p);
@@ -284,7 +284,7 @@ function decodeBase64Json<T>(p: string | undefined): T | null {
  * The `regalia` field is stringified JSON and can cause issues if parsed directly.
  * We strip it out first and replace HTML quotes before parsing.
  */
-function decodeLeaguePresence(p: string | undefined): LeaguePresenceData | null {
+export function decodeLeaguePresence(p: string | undefined): LeaguePresenceData | null {
   if (!p) return null;
   try {
     const cleanedString = p.replace(/&quot;/g, '"').replace(/"regalia":.+}",?/, '');
