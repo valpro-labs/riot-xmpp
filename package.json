@@ -1,6 +1,6 @@
 {
   "name": "@valpro-labs/riot-xmpp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A typed TypeScript client for Riot XMPP",
   "homepage": "https://github.com/valpro-labs/riot-xmpp#readme",
   "bugs": {
@@ -21,7 +21,7 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-   "scripts": {
+  "scripts": {
     "build": "tsc",
     "prepare": "npm run build"
   },
