@@ -2,16 +2,29 @@
   "name": "@valpro-labs/riot-xmpp",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://github.com/valpro-labs/riot-xmpp#readme",
+  "bugs": {
+    "url": "https://github.com/valpro-labs/riot-xmpp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valpro-labs/riot-xmpp.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "riot",
+    "xmpp"
+  ],
+  "author": "rhy3h",
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "sideEffects": false,
-  "scripts": {
+   "scripts": {
     "build": "tsc",
     "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "eventemitter3": "^5.0.4",
