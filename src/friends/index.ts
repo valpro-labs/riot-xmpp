@@ -26,7 +26,7 @@ export interface RosterInput {
   to: string;
   type: 'result';
   query: {
-    item: RosterQueryItem[] | RosterQueryItem;
+    item?: RosterQueryItem[] | RosterQueryItem;
     xmlns: 'jabber:iq:riotgames:roster';
   }
 }
@@ -68,9 +68,8 @@ export function formatRoster(presence: RosterInput): RosterOutput {
   const sender = parseJid(from);
   const recipient = parseJid(to);
 
-  const roster = Array.isArray(query.item) ?
-    formatRosterInfo(query.item) :
-    formatRosterInfo([query.item])
+  const items = query.item == null ? [] : Array.isArray(query.item) ? query.item : [query.item];
+  const roster = formatRosterInfo(items);
 
   return {
     sender,
