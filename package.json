@@ -1,6 +1,6 @@
 {
   "name": "@valpro-labs/riot-xmpp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A typed TypeScript client for Riot XMPP",
   "homepage": "https://github.com/valpro-labs/riot-xmpp#readme",
   "bugs": {
