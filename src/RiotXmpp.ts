@@ -22,6 +22,7 @@ import { parsePASToken } from './helpers';
 import { IXmppAuthProvider } from './types';
 
 import { formatRoster, RosterOutput } from './friends';
+import { formatChatHistory, ChatHistoryOutput } from './chatHistory';
 import { formatPresence, PresenceOutput } from './presence';
 
 interface XmppEvents {
@@ -31,6 +32,7 @@ interface XmppEvents {
 	presence: (data: PresenceOutput) => void;
 	message: (data: any) => void;
 	friends: (data: RosterOutput) => void;
+	chatHistory: (data: ChatHistoryOutput) => void;
 	debug: (type: string, data: any) => void;
 }
 
@@ -185,6 +187,8 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 				if (data?.query?.xmlns === 'jabber:iq:riotgames:roster') {
 					const roster = formatRoster(data);
 					this.emit('friends', roster);
+				} else if (Array.isArray(data?.message)) {
+					this.emit('chatHistory', formatChatHistory(data));
 				}
 				break;
 		}
