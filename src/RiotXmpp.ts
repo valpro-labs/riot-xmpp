@@ -180,15 +180,18 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 				this.emit('presence', presence);
 				break;
 			case 'message':
-				this.emit('message', formatMessage(data));
+				const message = formatMessage(data);
+				this.emit('message', message);
 				break;
 			case 'iq':
 				// Only handle roster IQs — ignore bind/session/other IQ types
 				// that arrive during or just after the handshake.
 				if (isRosterIq(data)) {
-					this.emit('friends', formatRoster(data));
+					const roster = formatRoster(data);
+					this.emit('friends', roster);
 				} else if (isChatHistoryIq(data)) {
-					this.emit('chatHistory', formatChatHistory(data));
+					const chatHistory = formatChatHistory(data);
+					this.emit('chatHistory', chatHistory);
 				}
 				break;
 		}
