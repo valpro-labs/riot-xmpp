@@ -105,7 +105,6 @@ export const presence = (presenceData: any = {}) => ({
 export const getArchive = (jid: string) => ({
 	iq: {
 		'@_type': 'get',
-		'@_id': 'get_archive_7',
 		query: {
 			'@_xmlns': 'jabber:iq:riotgames:archive',
 			'with': jid,
