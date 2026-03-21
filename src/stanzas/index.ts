@@ -101,3 +101,23 @@ export const removeFriendRequest = (puuid: string) => new Object({
 export const presence = (presenceData: any = {}) => ({
 	presence: presenceData,
 });
+
+export const getArchive = (jid: string) => ({
+	iq: {
+		'@_type': 'get',
+		'@_id': 'get_archive_7',
+		query: {
+			'@_xmlns': 'jabber:iq:riotgames:archive',
+			'with': jid,
+		},
+	},
+});
+
+export const sendChatMessage = (jid: string, message: string) => ({
+	message: {
+		'@_id': `${Date.now()}:1`,
+		'@_to': jid,
+		'@_type': 'chat',
+		body: message,
+	},
+});

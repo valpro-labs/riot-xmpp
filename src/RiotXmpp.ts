@@ -13,6 +13,8 @@ import {
 	setEntitlements,
 	sendFriendRequest,
 	removeFriendRequest,
+	getArchive,
+	sendChatMessage,
 } from './stanzas';
 import { ISocketProvider, SocketProvider } from './socket';
 
@@ -211,6 +213,16 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 	public removeFriendRequest(puuid: string) {
 		console.log('Remove out going friend request...');
 		this.client.sendXml(removeFriendRequest(puuid));
+	}
+
+	public fetchChatHistory(jid: string) {
+		console.log('Fetching chat history...');
+		this.client.sendXml(getArchive(jid));
+	}
+
+	public sendMessage(jid: string, message: string) {
+		console.log('Sending chat message...');
+		this.client.sendXml(sendChatMessage(jid, message));
 	}
 
 	public disconnect() {
