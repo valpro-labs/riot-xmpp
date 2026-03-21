@@ -46,6 +46,10 @@ function formatMessages(items: RawMessage[]): ChatHistoryMessage[] {
 	});
 }
 
+export function isChatHistoryIq(data: any): boolean {
+	return Array.isArray(data?.message);
+}
+
 export function formatChatHistory(data: ChatHistoryInput): ChatHistoryOutput {
 	const { from, to, message, reader } = data;
 

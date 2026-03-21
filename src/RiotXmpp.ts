@@ -21,8 +21,8 @@ import { ISocketProvider, SocketProvider } from './socket';
 import { parsePASToken } from './helpers';
 import { IXmppAuthProvider } from './types';
 
-import { formatRoster, RosterOutput } from './friends';
-import { formatChatHistory, ChatHistoryOutput } from './chatHistory';
+import { formatRoster, isRosterIq, RosterOutput } from './friends';
+import { formatChatHistory, isChatHistoryIq, ChatHistoryOutput } from './chatHistory';
 import { formatMessage, MessageOutput } from './message';
 import { formatPresence, PresenceOutput } from './presence';
 
@@ -180,18 +180,15 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 				this.emit('presence', presence);
 				break;
 			case 'message':
-				const message = formatMessage(data);
-				this.emit('message', message);
+				this.emit('message', formatMessage(data));
 				break;
 			case 'iq':
 				// Only handle roster IQs — ignore bind/session/other IQ types
 				// that arrive during or just after the handshake.
-				if (data?.query?.xmlns === 'jabber:iq:riotgames:roster') {
-					const roster = formatRoster(data);
-					this.emit('friends', roster);
-				} else if (Array.isArray(data?.message)) {
-					const chatHistory = formatChatHistory(data);
-					this.emit('chatHistory', chatHistory);
+				if (isRosterIq(data)) {
+					this.emit('friends', formatRoster(data));
+				} else if (isChatHistoryIq(data)) {
+					this.emit('chatHistory', formatChatHistory(data));
 				}
 				break;
 		}

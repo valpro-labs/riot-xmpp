@@ -62,6 +62,10 @@ function formatRosterInfo(items: RosterQueryItem[]): RosterOutputQueryItem[] {
   });
 }
 
+export function isRosterIq(data: any): boolean {
+  return data?.query?.xmlns === 'jabber:iq:riotgames:roster';
+}
+
 export function formatRoster(presence: RosterInput): RosterOutput {
   const { from, to, type, query } = presence;
 
