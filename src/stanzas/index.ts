@@ -72,7 +72,6 @@ export const fetchFriends = () => ({
 export const sendFriendRequest = (username: string, tagline: string) => new Object({
 	'iq': {
 		'@_type': "set",
-		'@_id': "roster_add_10",
 		'query': {
 			'@_xmlns': "jabber:iq:riotgames:roster",
 			'item': {
@@ -86,15 +85,14 @@ export const sendFriendRequest = (username: string, tagline: string) => new Obje
 	}
 });
 
-export const removeOutgoingFriendRequest = (jid: string) => new Object({
+export const removeFriendRequest = (puuid: string) => new Object({
 	'iq': {
 		'@_type': "set",
-		'@_id': "roster_remove_1",
 		'query': {
 			'@_xmlns': "jabber:iq:riotgames:roster",
 			'item': {
 				'@_subscription': "remove",
-				'@_jid': jid
+				'@_puuid': puuid
 			}
 		}
 	}
