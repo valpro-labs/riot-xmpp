@@ -23,6 +23,7 @@ import { IXmppAuthProvider } from './types';
 
 import { formatRoster, RosterOutput } from './friends';
 import { formatChatHistory, ChatHistoryOutput } from './chatHistory';
+import { formatMessage, MessageOutput } from './message';
 import { formatPresence, PresenceOutput } from './presence';
 
 interface XmppEvents {
@@ -30,7 +31,7 @@ interface XmppEvents {
 	ready: () => void;
 	closed: () => void;
 	presence: (data: PresenceOutput) => void;
-	message: (data: any) => void;
+	message: (data: MessageOutput) => void;
 	friends: (data: RosterOutput) => void;
 	chatHistory: (data: ChatHistoryOutput) => void;
 	debug: (type: string, data: any) => void;
@@ -179,7 +180,7 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 				this.emit('presence', presence);
 				break;
 			case 'message':
-				this.emit('message', data);
+				this.emit('message', formatMessage(data));
 				break;
 			case 'iq':
 				// Only handle roster IQs — ignore bind/session/other IQ types
