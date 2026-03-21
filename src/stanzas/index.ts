@@ -69,7 +69,6 @@ export const fetchFriends = () => ({
 	},
 });
 
-
 export const sendFriendRequest = (username: string, tagline: string) => new Object({
 	'iq': {
 		'@_type': "set",
