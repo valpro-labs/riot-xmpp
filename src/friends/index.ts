@@ -1,8 +1,11 @@
 import { Jid, parseJid } from '../helpers/parsers';
 
+export type RosterSubscription = 'both' | 'pending_in' | 'pending_out' | 'remove';
+export type RosterIqType = 'set' | 'result';
+
 interface RosterQueryItem {
-  note: string;
-  group: {
+  note?: string;
+  group?: {
     '#text': string;
     priority: string;
   };
@@ -17,14 +20,15 @@ interface RosterQueryItem {
     };
   };
   jid: string;
-  subscription: 'both' | 'pending_in' | 'pending_out';
+  subscription: RosterSubscription;
+  platform?: string;
   puuid: string;
 }
 
 export interface RosterInput {
   from: string;
   to: string;
-  type: 'result';
+  type: RosterIqType;
   query: {
     item?: RosterQueryItem[] | RosterQueryItem;
     xmlns: 'jabber:iq:riotgames:roster';
@@ -34,7 +38,7 @@ export interface RosterInput {
 export interface RosterOutput {
   sender: Jid;
   recipient: Jid;
-  type: string;
+  type: RosterIqType;
   roster: RosterOutputQueryItem[];
   presence: RosterInput;
 }
@@ -43,10 +47,10 @@ export interface RosterOutput {
 export interface RosterOutputQueryItem {
   jid: Jid;
   puuid: string;
-  subscription: 'both' | 'pending_in' | 'pending_out';
+  subscription: RosterSubscription;
   name: string;
   tagline: string;
-  note: string;
+  note?: string;
 }
 
 function formatRosterInfo(items: RosterQueryItem[]): RosterOutputQueryItem[] {
