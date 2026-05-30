@@ -21,7 +21,6 @@ export const clientName = () => ({
 			'puuid-mode': {
 				'@_enabled': 'true',
 			},
-			resource: 'RC-VALORANT-NODE',
 		},
 	},
 });
