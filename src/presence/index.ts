@@ -279,6 +279,50 @@ export function decodeBase64Json<T>(p: string | undefined): T | null {
   }
 }
 
+function tryParseJson(value: string): unknown | null {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function isLikelyBase64(value: string): boolean {
+  const trimmed = value.trim();
+  return trimmed.length > 0 && trimmed.length % 4 !== 1 && /^[A-Za-z0-9+/_-]+={0,2}$/.test(trimmed);
+}
+
+function tryDecodeBase64(value: string): string | null {
+  if (!isLikelyBase64(value)) {
+    return null;
+  }
+
+  try {
+    return decode(value);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeLeaguePresenceData(value: unknown): LeaguePresenceData | null {
+  let parsed = value;
+
+  if (typeof parsed === 'string') {
+    parsed = tryParseJson(parsed);
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    return null;
+  }
+
+  const presence = parsed as LeaguePresenceData;
+  if (typeof presence.regalia === 'string') {
+    presence.regalia = (tryParseJson(presence.regalia) as LeagueRegalia | null) ?? presence.regalia;
+  }
+
+  return presence;
+}
+
 /**
  * Parses League of Legends presence data.
  * The `regalia` field is stringified JSON and can cause issues if parsed directly.
@@ -286,14 +330,35 @@ export function decodeBase64Json<T>(p: string | undefined): T | null {
  */
 export function decodeLeaguePresence(p: string | undefined): LeaguePresenceData | null {
   if (!p) return null;
-  try {
-    const cleanedString = p.replace(/&quot;/g, '"').replace(/"regalia":.+}",?/, '');
-    const parsed = JSON.parse(cleanedString);
-    return parsed as LeaguePresenceData;
-  } catch (e) {
-    console.error('Error decoding league presence p:', e);
-    return null;
+
+  const decodedString = tryDecodeBase64(p);
+  if (decodedString) {
+    const decodedPresence = normalizeLeaguePresenceData(tryParseJson(decodedString) ?? decodedString);
+    if (decodedPresence) {
+      return decodedPresence;
+    }
+
+    const decodedCleanedString = decodedString.replace(/&quot;/g, '"');
+    const decodedCleanedPresence = normalizeLeaguePresenceData(tryParseJson(decodedCleanedString));
+    if (decodedCleanedPresence) {
+      return decodedCleanedPresence;
+    }
   }
+
+  const cleanedString = p.replace(/&quot;/g, '"');
+  const cleanedPresence = normalizeLeaguePresenceData(tryParseJson(cleanedString));
+  if (cleanedPresence) {
+    return cleanedPresence;
+  }
+
+  const parsedWithoutRegalia = normalizeLeaguePresenceData(
+    tryParseJson(cleanedString.replace(/"regalia":.+}",?/, '')),
+  );
+  if (parsedWithoutRegalia) {
+    return parsedWithoutRegalia;
+  }
+
+  return null;
 }
 
 export function formatPresence(presence: PresenceInput): PresenceOutput {
