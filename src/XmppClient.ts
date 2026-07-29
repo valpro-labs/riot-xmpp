@@ -13,6 +13,7 @@ export interface XmppClientEvents {
 const xmlParser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '',
+  parseTagValue: false,
 });
 
 const xmlBuilder = new XMLBuilder({
