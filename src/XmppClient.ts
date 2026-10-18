@@ -34,7 +34,7 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
   }
 
   public get isConnected(): boolean {
-    return !!this.socket && this.socket.readyState === 'open' && !this.socket.destroyed;
+    return this.isSocketWritable(this.socket);
   }
 
   public connect(options: ConnectOptions): Promise<void> {
@@ -53,7 +53,11 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
           });
 
           socket.on('end', () => {
-            this.emit('closed');
+            this.handleSocketClosed(socket);
+          });
+
+          socket.on('close', () => {
+            this.handleSocketClosed(socket);
           });
 
           resolve();
@@ -63,9 +67,7 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
   }
 
   public send(data: string): void {
-    if (this.socket && this.socket.readyState === 'open') {
-      this.socket.write(data, 'utf8');
-    }
+    this.write(data);
   }
 
   public sendXml(obj: any): void {
@@ -74,24 +76,45 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
 
   public sendAndRead(data: string, timeoutMs = 10_000): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (!this.socket || this.socket.readyState !== 'open') {
+      if (!this.isSocketWritable(this.socket)) {
         return reject(new Error('Socket is not open'));
       }
 
-      const timer = setTimeout(() => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+
+      const cleanup = () => {
+        if (timer !== undefined) clearTimeout(timer);
         this.off('stanza', onStanza);
-        reject(
-          new Error('sendAndRead() timed out waiting for stanza response'),
-        );
-      }, timeoutMs);
+        this.off('closed', onClosed);
+      };
 
       const onStanza = (stanza: any) => {
-        clearTimeout(timer);
+        cleanup();
         resolve(stanza);
       };
 
+      const onClosed = () => {
+        cleanup();
+        reject(new Error('Socket is closed.'));
+      };
+
+      timer = setTimeout(() => {
+        cleanup();
+        reject(new Error('sendAndRead() timed out waiting for stanza response'));
+      }, timeoutMs);
+
       this.once('stanza', onStanza);
-      this.socket.write(data, 'utf8');
+      this.once('closed', onClosed);
+
+      try {
+        if (!this.write(data)) {
+          cleanup();
+          reject(new Error('Socket is closed.'));
+        }
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     });
   }
 
@@ -105,7 +128,40 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
     // Clear the buffer to prevent stale data from the previous connection
     // bleeding into the next account's connection stream.
     this.bufferedMessage = '';
-    socket?.end();
+
+    if (socket) {
+      try {
+        socket.end();
+      } finally {
+        this.emit('closed');
+      }
+    }
+  }
+
+  private isSocketWritable(socket: ITlsSocket | null): socket is ITlsSocket {
+    return !!socket && socket.readyState === 'open' && !socket.pending && !socket.destroyed;
+  }
+
+  private write(data: string): boolean {
+    const socket = this.socket;
+    if (!this.isSocketWritable(socket)) return false;
+
+    try {
+      socket.write(data, 'utf8');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Socket is closed.') return false;
+      throw error;
+    }
+
+    return true;
+  }
+
+  private handleSocketClosed(socket: ITlsSocket) {
+    if (this.socket !== socket) return;
+
+    this.socket = null;
+    this.bufferedMessage = '';
+    this.emit('closed');
   }
 
   private handleData(data: string) {
