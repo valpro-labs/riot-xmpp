@@ -23,6 +23,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "test": "bun run build && node --test",
     "prepare": "npm run build"
   },
   "type": "commonjs",

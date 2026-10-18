@@ -4,6 +4,7 @@
  */
 export interface ITlsSocket {
   readonly readyState: string;
+  readonly destroyed?: boolean;
   write(data: string, encoding?: BufferEncoding): void;
   end(): void;
   on(event: "data", listener: (data: Buffer | string) => void): this;

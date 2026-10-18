@@ -237,8 +237,15 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 		this.manualDisconnect = true;
 		this.currentConnectionId++;
 		this.stopHeartbeat();
-		if (this.client.isConnected) {
-			this.client.send('</stream:stream>');
+		try {
+			if (this.client.isConnected) {
+				this.client.send('</stream:stream>');
+			}
+		} catch (error) {
+			if (!(error instanceof Error) || error.message !== 'Socket is closed.') {
+				throw error;
+			}
+		} finally {
 			this.client.disconnect();
 		}
 	}

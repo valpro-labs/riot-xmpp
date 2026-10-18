@@ -34,7 +34,7 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
   }
 
   public get isConnected(): boolean {
-    return !!this.socket && this.socket.readyState === 'open';
+    return !!this.socket && this.socket.readyState === 'open' && !this.socket.destroyed;
   }
 
   public connect(options: ConnectOptions): Promise<void> {
@@ -100,13 +100,12 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
   }
 
   public disconnect() {
-    if (this.socket) {
-      this.socket.end();
-      this.socket = null;
-    }
+    const socket = this.socket;
+    this.socket = null;
     // Clear the buffer to prevent stale data from the previous connection
     // bleeding into the next account's connection stream.
     this.bufferedMessage = '';
+    socket?.end();
   }
 
   private handleData(data: string) {
