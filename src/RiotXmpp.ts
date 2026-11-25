@@ -103,10 +103,18 @@ export class RiotXmpp extends EventEmitter<XmppEvents> {
 		this.regionData = region;
 
 		const host = XmppRegions.getHost(region);
-		await this.client.connect({ port: 5223, host });
-		console.log(`Connected to ${lookupName} (${host})`);
 
-		await this.performHandshake(connectionId);
+		try {
+			await this.client.connect({ port: 5223, host });
+			console.log(`Connected to ${lookupName} (${host})`);
+
+			await this.performHandshake(connectionId);
+		} catch (error) {
+			// disconnect() or a newer connect() closes the socket under this attempt, which shows
+			// up as a rejected handshake. That attempt was replaced, not failed.
+			if (connectionId !== this.currentConnectionId) return;
+			throw error;
+		}
 
 		if (connectionId !== this.currentConnectionId) return;
 
