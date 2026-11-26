@@ -370,3 +370,27 @@ test('disconnect emits closed even when ending the socket throws', () => {
   assert.equal(closedEvents, 1);
   assert.equal(client.isConnected, false);
 });
+
+test('socket errors from a detached socket are dropped, errors from the live socket are emitted', async () => {
+  class FakeSocket extends EventEmitter {
+    readyState = 'open';
+    pending = false;
+    destroyed = false;
+
+    write() {}
+
+    end() {}
+  }
+
+  const socket = new FakeSocket();
+  const client = new XmppClient({ connect: async () => socket });
+  const errors = [];
+  client.on('error', (err) => errors.push(err.message));
+  await client.connect({ host: 'example.test', port: 5223 });
+
+  socket.emit('error', new Error('live failure'));
+  client.disconnect();
+  socket.emit('error', new Error('Socket is closed'));
+
+  assert.deepEqual(errors, ['live failure']);
+});

@@ -49,6 +49,10 @@ export class XmppClient extends EventEmitter<XmppClientEvents> {
           });
 
           socket.on('error', (err) => {
+            // A socket we already detached (disconnect() or a newer connect()) reports the
+            // teardown of its own read loop as an error ("Socket is closed"). That is not a
+            // failure of the live connection, so it must not reach the consumer.
+            if (this.socket !== socket) return;
             this.emit('error', err);
           });
 
